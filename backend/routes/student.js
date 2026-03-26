@@ -84,7 +84,7 @@ const Attendance = require('../models/Attendance');
 const Teacher = require('../models/teacherModel');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-
+require('dotenv').config();
 // Middleware to restrict to Admin or Principal
 
 const restrictAccess = (req, res, next) => {
@@ -315,6 +315,22 @@ router.post(
 
       const savedStudent = await newStudent.save({ session });
 
+      const mailOptions = {
+  from: process.env.NODEMAILER_EMAIL,
+  to: email,
+  subject: "Student Login Credentials",
+  html: `
+    <h3>Welcome to School Portal</h3>
+    <p>Dear ${name},</p>
+    <p>Your account has been created successfully.</p>
+    <p><b>Username:</b> ${email}</p>
+    <p><b>Password:</b> ${password}</p>
+    <br/>
+    <p>Please login and change your password.</p>
+  `,
+};
+
+await transporter.sendMail(mailOptions);
       // Handle health record
       let healthRecordId = null;
       if (
@@ -1248,13 +1264,20 @@ router.get('/student/dashboard/:email', async (req, res) => {
 // });
 
 // Nodemailer transporter setup
+// const transporter = nodemailer.createTransport({
+//   host: 'smtp.gmail.com',
+//   port: 587,
+//   secure: false,
+//   auth: {
+//     user: '....', // Replace with your email
+//     pass: '....', // Replace with your app password
+//   },
+// });
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false,
+  service: process.env.NODEMAILER_SERVICE,
   auth: {
-    user: '....', // Replace with your email
-    pass: '....', // Replace with your app password
+    user: process.env.NODEMAILER_EMAIL,
+    pass: process.env.NODEMAILER_PASSWORD,
   },
 });
 
