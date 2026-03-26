@@ -11,7 +11,15 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid'); // For generating unique identifiers
-
+const nodemailer = require("nodemailer");
+require('dotenv').config();
+const transporter = nodemailer.createTransport({
+  service: process.env.NODEMAILER_SERVICE,
+  auth: {
+    user: process.env.NODEMAILER_EMAIL,
+    pass: process.env.NODEMAILER_PASSWORD,
+  },
+});
 // Enhanced Multer Configuration for profile pictures
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -383,6 +391,22 @@ password
 
       const savedTeacher = await newTeacher.save();
 
+  const mailOptions = {
+  from: process.env.NODEMAILER_EMAIL,
+  to: email,
+  subject: "Teacher Login Credentials",
+  html: `
+    <h3>Welcome to School Portal</h3>
+    <p>Dear ${name},</p>
+    <p>Your account has been created successfully.</p>
+    <p><b>Username:</b> ${email}</p>
+    <p><b>Password:</b> ${password}</p>
+    <br/>
+    <p>Please login and change your password.</p>
+  `,
+};
+
+await transporter.sendMail(mailOptions);
 
       const newUser = new User({
         name,
