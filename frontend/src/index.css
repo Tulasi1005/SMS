@@ -16,14 +16,14 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--background-color);
+  /* background-color: var(--background-color); */
 }
 
 .sidebar {
   min-height: 100vh;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  background-color: var(--primary-color);
-  color: white;
+  /* background-color: var(--primary-color); */
+  color: black;
 }
 
 .main-content {
@@ -51,7 +51,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+  /* background: linear-gradient(135deg, var(--primary-color), var(--success-color)); */
 }
 
 .auth-card {

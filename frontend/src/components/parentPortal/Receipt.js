@@ -149,6 +149,14 @@ const Receipt = () => {
     );
   }
 
+  const branchContactLine = [
+    receipt.branchLocation && `Location: ${receipt.branchLocation}`,
+    receipt.branchPhoneNumber && `Phone: ${receipt.branchPhoneNumber}`,
+    receipt.branchEmail && `Email: ${receipt.branchEmail}`,
+  ]
+    .filter(Boolean)
+    .join(" | ");
+
   return (
     <Container className="py-4">
       <div className="d-flex justify-content-between mb-4">
@@ -188,13 +196,31 @@ const Receipt = () => {
         <Card className="shadow-sm border-0 mb-4">
           <Card.Body className="p-4">
             <div className="text-center mb-4">
-              <h2 className="mb-1">School Management System</h2>
-              <p className="text-muted mb-0">
-                123 Education Street, Knowledge City
-              </p>
-              <p className="text-muted">
-                Phone: (123) 456-7890 | Email: info@school.edu
-              </p>
+              <h2 className="mb-1" style={{ color: "#000" }}>
+                School Management System
+              </h2>
+              {receipt.branchName && (
+                <p className="text-muted mb-0">{receipt.branchName}</p>
+              )}
+              {branchContactLine && (
+                <div
+                  style={{
+                    overflowX: "auto",
+                    WebkitOverflowScrolling: "touch",
+                  }}
+                >
+                  <p
+                    className="text-muted mb-0"
+                    style={{
+                      whiteSpace: "nowrap",
+                      display: "inline-block",
+                      minWidth: "100%",
+                    }}
+                  >
+                    {branchContactLine}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="text-center mb-4">

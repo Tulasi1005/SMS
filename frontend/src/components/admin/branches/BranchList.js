@@ -89,6 +89,8 @@ const BranchList = () => {
             <tr>
               <th className='branch-list-table-header-cell'>Name</th>
               <th className='branch-list-table-header-cell'>Location</th>
+              <th className='branch-list-table-header-cell'>Phone Number</th>
+              <th className='branch-list-table-header-cell'>Email</th>
               <th className='branch-list-table-header-cell'>Status</th>
               <th className='branch-list-table-header-cell'>Principal</th>
               <th className='branch-list-table-header-cell'>Actions</th>
@@ -105,6 +107,10 @@ const BranchList = () => {
                   {branch.branchName}
                 </td>
                 <td className='branch-list-table-cell'>{branch.location}</td>
+                <td className='branch-list-table-cell'>
+                  {branch.phoneNumber || 'N/A'}
+                </td>
+                <td className='branch-list-table-cell'>{branch.email || 'N/A'}</td>
                 <td className='branch-list-table-cell'>
                   <span
                     className={`branch-list-status-badge ${

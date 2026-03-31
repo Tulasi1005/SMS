@@ -12,9 +12,21 @@ const storage = multer.diskStorage({
 });
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-  cb(null, allowedTypes.includes(file.mimetype));
+  const extname = /\.(jpeg|jpg|png)$/i.test(file.originalname);
+  const mimetype = allowedTypes.includes(file.mimetype);
+
+  if (extname && mimetype) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only images (jpeg, jpg, png) are allowed'), false);
+  }
 };
-const upload = multer({ storage, fileFilter });
+
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: fileFilter,
+}).single('image');   // ← Important: field name is 'image'
 
 // Restrict to Principal or Admin
 const restrictToAdminOrPrincipal = (req, res, next) => {
@@ -46,41 +58,139 @@ router.get('/books', authMiddleware, restrictAccess, async (req, res) => {
 });
 
 // POST new book
-router.post('/books', authMiddleware, restrictAccess, upload.single('image'), async (req, res) => {
-  const { name, author, total, category } = req.body;
-  const image = req.file ? `/uploads/${req.file.filename}` : '';
-  try {
-    const newBook = new Book({
-      name, author, image, total, available: total, category,
-      branchId: req.user.role === 'principal' ? req.user.branchId : null,
+router.post(
+  '/books',
+  authMiddleware,
+  restrictAccess,
+  (req, res, next) => {
+    upload(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({
+          success: false,
+          message: err.message || 'Image upload failed',
+        });
+      }
+      next();
     });
-    const savedBook = await newBook.save();
-    res.status(201).json(savedBook);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
+  },
+  async (req, res) => {
+    try {
+      const { name, author, total, category, branchId: providedBranchId } = req.body;
+
+      if (!name || !author || !total || !category) {
+        return res.status(400).json({
+          success: false,
+          message: 'Name, author, total, and category are required',
+        });
+      }
+
+      const branchId = req.user.role === 'principal'
+        ? req.user.branchId
+        : providedBranchId || null;
+
+      if (!branchId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Branch ID is required',
+        });
+      }
+
+      // Save image path if uploaded
+      const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
+      const newBook = new Book({
+        name,
+        author,
+        image: imagePath,
+        total: parseInt(total),
+        available: parseInt(total),
+        category,
+        branchId,
+      });
+
+      const savedBook = await newBook.save();
+
+      res.status(201).json({
+        success: true,
+        message: 'Book added successfully',
+        data: savedBook,
+      });
+    } catch (error) {
+      console.error('Error adding book:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message,
+      });
+    }
   }
-});
+);
 
 // PUT update book
-router.put('/books/:id', authMiddleware, restrictAccess, upload.single('image'), async (req, res) => {
-  const { name, author, total, category } = req.body;
-  const imagePath = req.file ? `/uploads/${req.file.filename}` : undefined;
-  try {
-    const book = await Book.findById(req.params.id);
-    if (!book) return res.status(404).json({ message: 'Book not found' });
-    if (req.user.role === 'principal' && book.branchId.toString() !== req.user.branchId.toString()) {
-      return res.status(403).json({ message: 'Access denied' });
+// PUT - Update Book (with optional image update)
+router.put(
+  '/books/:id',
+  authMiddleware,
+  restrictAccess,
+  (req, res, next) => {
+    upload(req, res, (err) => {
+      if (err) {
+        return res.status(400).json({
+          success: false,
+          message: err.message || 'Image upload failed',
+        });
+      }
+      next();
+    });
+  },
+  async (req, res) => {
+    try {
+      const { name, author, total, category } = req.body;
+      const book = await Book.findById(req.params.id);
+
+      if (!book) {
+        return res.status(404).json({ success: false, message: 'Book not found' });
+      }
+
+      // Branch access check
+      if (req.user.role === 'principal' && book.branchId.toString() !== req.user.branchId.toString()) {
+        return res.status(403).json({ success: false, message: 'Access denied' });
+      }
+
+      const updateData = {
+        name,
+        author,
+        total: total ? parseInt(total) : book.total,
+        category,
+        available: total ? parseInt(total) : book.available, // Optional: reset available if total changes
+      };
+
+      // Update image only if a new one is uploaded
+      if (req.file) {
+        updateData.image = `/uploads/${req.file.filename}`;
+      }
+
+      const updatedBook = await Book.findByIdAndUpdate(
+        req.params.id,
+        updateData,
+        { new: true, runValidators: true }
+      );
+
+      res.json({
+        success: true,
+        message: 'Book updated successfully',
+        data: updatedBook,
+      });
+    } catch (error) {
+      console.error('Error updating book:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Server error',
+        error: error.message,
+      });
     }
-    const updatedBook = await Book.findByIdAndUpdate(
-      req.params.id,
-      { name, author, total, category, ...(imagePath && { image: imagePath }) },
-      { new: true }
-    );
-    res.json(updatedBook);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
   }
-});
+);
 
 // DELETE book
 router.delete('/books/:id', authMiddleware, restrictAccess, async (req, res) => {

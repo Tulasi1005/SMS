@@ -29,6 +29,20 @@ const schema = yup.object({
     .matches(/^[a-zA-Z0-9\s]+$/, "Location can only contain letters, numbers, and spaces")
     .matches(/[a-zA-Z]/, "Location must contain at least one letter"),
   
+  phoneNumber: yup
+    .string()
+    .required("Phone number is required")
+    .matches(
+      /^[6-9][0-9]{9}$/,
+      "Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits"
+    ),
+
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Enter a valid email address")
+    .max(100, "Email cannot exceed 100 characters"),
+  
   address: yup.object({
     street: yup
       .string()
@@ -91,6 +105,8 @@ const AddBranch = () => {
     defaultValues: {
       branchName: "",
       location: "",
+      phoneNumber: "",
+      email: "",
       status: "active",
       address: { street: "", city: "", state: "", zipCode: "", country: "" },
     },
@@ -202,6 +218,49 @@ const AddBranch = () => {
               {touchedFields.address?.city && errors.address?.city && (
                 <span className="add-branch-error-text">
                   {errors.address.city.message}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="add-branch-form-row">
+            <div className="add-branch-form-group">
+              <label className="add-branch-label text-white">Phone Number</label>
+              <input
+                type="tel"
+                {...register("phoneNumber")}
+                className="add-branch-input"
+                inputMode="numeric"
+                maxLength={10}
+                pattern="[6-9][0-9]{9}"
+                title="Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits"
+                onChange={(e) => {
+                  register("phoneNumber").onChange(e);
+                  trigger("phoneNumber");
+                }}
+              />
+              {touchedFields.phoneNumber && errors.phoneNumber && (
+                <span className="add-branch-error-text" role="alert">
+                  <span className="add-branch-warning-icon" aria-hidden="true">
+                    &#9888;
+                  </span>{" "}
+                  {errors.phoneNumber.message}
+                </span>
+              )}
+            </div>
+            <div className="add-branch-form-group">
+              <label className="add-branch-label text-white">Email</label>
+              <input
+                type="email"
+                {...register("email")}
+                className="add-branch-input"
+                onChange={(e) => {
+                  register("email").onChange(e);
+                  trigger("email");
+                }}
+              />
+              {touchedFields.email && errors.email && (
+                <span className="add-branch-error-text">
+                  {errors.email.message}
                 </span>
               )}
             </div>

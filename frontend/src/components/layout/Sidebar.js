@@ -241,10 +241,10 @@ const Sidebar = ({ showSidebar, toggleSidebar }) => {
           overflowY: "auto",
           overflowX: "hidden",
           zIndex: 1000,
-          background: "#4C639B",
-          boxShadow: "4px 0 12px rgba(0, 0, 0, 0.2)",
           paddingLeft: "10px",
           paddingRight: "10px",
+          color: "black",
+          backgroundColor: "white"
         }}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
@@ -267,7 +267,7 @@ const Sidebar = ({ showSidebar, toggleSidebar }) => {
                     <Dropdown.Toggle
                       variant="link"
                       style={{
-                        color: "#fff",
+                        color: "#000",
                         width: "100%",
                         textAlign: "left",
                         display: "flex",
@@ -317,7 +317,7 @@ const Sidebar = ({ showSidebar, toggleSidebar }) => {
                     className={`nav-link pt-3 ${
                       location.pathname === item.path ? "bg-warning" : ""
                     }`}
-                    style={{ color: "#fff", display: "flex", alignItems: "center" }}
+                    style={{ color: "#0000ff", display: "flex", alignItems: "center" }}
                   >
                     <item.icon size={20} style={{ marginRight: "10px" }} />
                     {isSidebarVisible && (
@@ -337,7 +337,7 @@ const Sidebar = ({ showSidebar, toggleSidebar }) => {
               style={{
                 textAlign: "center",
                 padding: "15px",
-                color: "#fff",
+                color: "#0000ff",
                 borderTop: "1px solid rgba(255,255,255,0.25)",
               }}
             >

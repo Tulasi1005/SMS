@@ -433,7 +433,7 @@ const Dashboard = () => {
             mb: { xs: 2, sm: 3 },
           }}
         >
-          <h2 className='admin-title'>Dashboard</h2>
+          <h2 className='admin-title'>Principal Dashboard</h2>
           <IconButton onClick={handleRefresh} sx={{ color: '#fff' }}>
             <Refresh />
           </IconButton>
@@ -508,12 +508,12 @@ const Dashboard = () => {
                   '&:hover': { transform: 'scale(1.05)' },
                   backgroundColor:
                     item.label === 'Total Students'
-                      ? '#4c639b'
-                      : item.label === 'Total Teachers'
-                      ? '#7091e5'
-                      : item.label === 'Total Buses'
                       ? '#ffffff'
-                      : '#ffffff',
+                      : item.label === 'Total Teachers'
+                        ? '#7091e5'
+                        : item.label === 'Total Buses'
+                          ? '#ffffff'
+                          : '#ffffff',
                   color:
                     item.label === 'Total Teachers' ? '#ffffff' : '#1a1a1a',
                 }}
@@ -584,7 +584,6 @@ const Dashboard = () => {
               <Paper
                 sx={{
                   p: { xs: 2, sm: 3 },
-                  background: 'linear-gradient(145deg, #ffffff, #fff3e0)',
                   borderRadius: '16px',
                   boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)',
                   transition: 'all 0.3s ease',
@@ -601,7 +600,7 @@ const Dashboard = () => {
                     left: 0,
                     right: 0,
                     height: '4px',
-                    background: 'linear-gradient(to right, #4c639b, #212121)',
+                    
                   },
                 }}
               >
@@ -628,7 +627,7 @@ const Dashboard = () => {
                       innerRadius={50}
                       outerRadius={90}
                       paddingAngle={3}
-                      labelLine={{ stroke: '#1a1a1a', strokeWidth: 1 }}
+                      labelLine={{ stroke: '#0000ff', strokeWidth: 1 }}
                     >
                       {genderData.map((entry, index) => (
                         <Cell
@@ -692,7 +691,6 @@ const Dashboard = () => {
               elevation={0}
               sx={{
                 p: { xs: 1.5, sm: 3 },
-                background: 'linear-gradient(145deg, #ffffff, #fff3e0)',
                 borderRadius: '20px',
                 width: '100%',
                 maxWidth: { xs: '100%', sm: '400px', md: '450px', lg: '500px' },
@@ -754,141 +752,140 @@ const Dashboard = () => {
                   transition={{ duration: 0.5 }}
                 >
                   <DateCalendar
-                                        value={selectedDate}
-                                        onChange={(newDate) => setSelectedDate(newDate)}
-                                        onMonthChange={handleMonthChange}
-                                        slots={{ day: ServerDay }}
-                                        slotProps={{
-                                          day: {
-                                            highlightedDays,
-                                          },
-                                        }}
-                                        sx={{
-                                          width: "100%",
-                                          maxWidth: "100%",
-                                          height: "auto",
-                                          background: "rgba(76, 175, 80, 0.05)",
-                                          borderRadius: 2,
-                                          p: { xs: 0.5, sm: 1, md: 1.5 },
-                                          boxShadow: "inset 0 1px 4px rgba(0, 0, 0, 0.03)",
-                                          border: "1px solid rgba(76, 175, 80, 0.3)",
-                                          "& .MuiDateCalendar-root": {
-                                            width: "100%",
-                                            minHeight: {
-                                              xs: "280px",
-                                              sm: "320px",
-                                              md: "340px",
-                                            },
-                                          },
-                                          "& .MuiPickersDay-root": {
-                                            fontSize: {
-                                              xs: "0.7rem",
-                                              sm: "0.8rem",
-                                              md: "0.85rem",
-                                            },
-                                            width: { xs: "28px", sm: "32px", md: "36px" },
-                                            height: { xs: "28px", sm: "32px", md: "36px" },
-                                            borderRadius: "50%",
-                                            margin: "0 auto",
-                                            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-                                            "&.Mui-selected": {
-                                              background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
-                                              color: "black",
-                                              fontWeight: 700,
-                                              boxShadow: "0 2px 8px rgba(76, 175, 80, 0.5)",
-                                              "&:hover": {
-                                                background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
-                                              },
-                                            },
-                                          },
-                                          "& .MuiDayCalendar-weekDayLabel": {
-                                            fontSize: {
-                                              xs: "0.65rem",
-                                              sm: "0.75rem",
-                                              md: "0.8rem",
-                                            },
-                                            width: { xs: "28px", sm: "32px", md: "36px" },
-                                            height: { xs: "24px", sm: "28px", md: "30px" },
-                                            color: "black",
-                                            fontWeight: 600,
-                                            letterSpacing: "0.05em",
-                                            margin: "0 auto",
-                                          },
-                                          "& .MuiPickersCalendarHeader-label": {
-                                            fontSize: {
-                                              xs: "0.8rem",
-                                              sm: "0.95rem",
-                                              md: "1.05rem",
-                                            },
-                                            color: "black",
-                                            fontWeight: 700,
-                                            background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
-                                            WebkitBackgroundClip: "text",
-                                            WebkitTextFillColor: "transparent",
-                                          },
-                                          "& .MuiDayCalendar-slideTransition": {
-                                            minHeight: {
-                                              xs: "180px",
-                                              sm: "220px",
-                                              md: "240px",
-                                            },
-                                          },
-                                          "& .MuiPickersArrowSwitcher-root": {
-                                            "& .MuiIconButton-root": {
-                                              color: "#f5f5f5",
-                                              background: "rgba(34, 101, 202, 0.57)",
-                                              borderRadius: "50%",
-                                              padding: { xs: "4px", sm: "6px", md: "8px" },
-                                              transition: "all 0.3s ease",
-                                              boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                                              "&:hover": {
-                                                background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
-                                                color: "#4C91B6",
-                                                boxShadow: "0 2px 8px rgba(76, 175, 80, 0.3)",
-                                                transform: "scale(1.1)",
-                                              },
-                                            },
-                                          },
-                                          "& .MuiDayCalendar-weekContainer": {
-                                            margin: { xs: "1px 0", sm: "2px 0" },
-                                            justifyContent: "space-around",
-                                          },
-                                          "& .MuiPickersCalendarHeader-root": {
-                                            padding: { xs: "4px", sm: "8px", md: "10px" },
-                                            marginTop: { xs: "2px", sm: "4px", md: "6px" },
-                                            marginBottom: { xs: "4px", sm: "6px", md: "8px" },
-                                          },
-                                          // Add styles for the YearPicker to display in one column on mobile
-                                          "& .MuiYearCalendar-root": {
-                                            display: "grid",
-                                            gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)", md: "repeat(4, 1fr)" }, // Single column on mobile, multi-column on larger screens
-                                            gap: { xs: "8px", sm: "12px" },
-                                            padding: { xs: "8px", sm: "12px" },
-                                            justifyItems: "center",
-                                            maxWidth: { xs: "200px", sm: "100%" }, // Limit width on mobile for better centering
-                                            mx: { xs: "auto", sm: 0 }, // Center on mobile
-                                          },
-                                          "& .MuiPickersYear-yearButton": {
-                                            fontSize: { xs: "0.9rem", sm: "1rem" },
-                                            width: { xs: "100%", sm: "auto" },
-                                            padding: { xs: "8px", sm: "10px" },
-                                            borderRadius: "8px",
-                                            transition: "all 0.3s ease",
-                                            "&:hover": {
-                                              background: "rgba(76, 175, 80, 0.2)",
-                                              transform: "scale(1.05)",
-                                            },
-                                            "&.Mui-selected": {
-                                              background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
-                                              color: "black",
-                                              fontWeight: 700,
-                                              "&:hover": {
-                                                background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
-                                              },
-                                            },
-                                          },
-                                        }}
-                                      />
+                    value={selectedDate}
+                    onChange={(newDate) => setSelectedDate(newDate)}
+                    onMonthChange={handleMonthChange}
+                    slots={{ day: ServerDay }}
+                    slotProps={{
+                      day: {
+                        highlightedDays,
+                      },
+                    }}
+                    sx={{
+                      width: "100%",
+                      maxWidth: "100%",
+                      height: "auto",
+                      borderRadius: 2,
+                      p: { xs: 0.5, sm: 1, md: 1.5 },
+                      boxShadow: "inset 0 1px 4px rgba(0, 0, 0, 0.03)",
+                      border: "1px solid rgba(76, 175, 80, 0.3)",
+                      "& .MuiDateCalendar-root": {
+                        width: "100%",
+                        minHeight: {
+                          xs: "280px",
+                          sm: "320px",
+                          md: "340px",
+                        },
+                      },
+                      "& .MuiPickersDay-root": {
+                        fontSize: {
+                          xs: "0.7rem",
+                          sm: "0.8rem",
+                          md: "0.85rem",
+                        },
+                        width: { xs: "28px", sm: "32px", md: "36px" },
+                        height: { xs: "28px", sm: "32px", md: "36px" },
+                        borderRadius: "50%",
+                        margin: "0 auto",
+                        transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+                        "&.Mui-selected": {
+                          background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
+                          color: "black",
+                          fontWeight: 700,
+                          boxShadow: "0 2px 8px rgba(76, 175, 80, 0.5)",
+                          "&:hover": {
+                            background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
+                          },
+                        },
+                      },
+                      "& .MuiDayCalendar-weekDayLabel": {
+                        fontSize: {
+                          xs: "0.65rem",
+                          sm: "0.75rem",
+                          md: "0.8rem",
+                        },
+                        width: { xs: "28px", sm: "32px", md: "36px" },
+                        height: { xs: "24px", sm: "28px", md: "30px" },
+                        color: "black",
+                        fontWeight: 600,
+                        letterSpacing: "0.05em",
+                        margin: "0 auto",
+                      },
+                      "& .MuiPickersCalendarHeader-label": {
+                        fontSize: {
+                          xs: "0.8rem",
+                          sm: "0.95rem",
+                          md: "1.05rem",
+                        },
+                        color: "black",
+                        fontWeight: 700,
+                        background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
+                        WebkitBackgroundClip: "text",
+                        WebkitTextFillColor: "transparent",
+                      },
+                      "& .MuiDayCalendar-slideTransition": {
+                        minHeight: {
+                          xs: "180px",
+                          sm: "220px",
+                          md: "240px",
+                        },
+                      },
+                      "& .MuiPickersArrowSwitcher-root": {
+                        "& .MuiIconButton-root": {
+                          color: "#f5f5f5",
+                          background: "rgba(34, 101, 202, 0.57)",
+                          borderRadius: "50%",
+                          padding: { xs: "4px", sm: "6px", md: "8px" },
+                          transition: "all 0.3s ease",
+                          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                          "&:hover": {
+                            background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
+                            color: "#4C91B6",
+                            boxShadow: "0 2px 8px rgba(76, 175, 80, 0.3)",
+                            transform: "scale(1.1)",
+                          },
+                        },
+                      },
+                      "& .MuiDayCalendar-weekContainer": {
+                        margin: { xs: "1px 0", sm: "2px 0" },
+                        justifyContent: "space-around",
+                      },
+                      "& .MuiPickersCalendarHeader-root": {
+                        padding: { xs: "4px", sm: "8px", md: "10px" },
+                        marginTop: { xs: "2px", sm: "4px", md: "6px" },
+                        marginBottom: { xs: "4px", sm: "6px", md: "8px" },
+                      },
+                      // Add styles for the YearPicker to display in one column on mobile
+                      "& .MuiYearCalendar-root": {
+                        display: "grid",
+                        gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)", md: "repeat(4, 1fr)" }, // Single column on mobile, multi-column on larger screens
+                        gap: { xs: "8px", sm: "12px" },
+                        padding: { xs: "8px", sm: "12px" },
+                        justifyItems: "center",
+                        maxWidth: { xs: "200px", sm: "100%" }, // Limit width on mobile for better centering
+                        mx: { xs: "auto", sm: 0 }, // Center on mobile
+                      },
+                      "& .MuiPickersYear-yearButton": {
+                        fontSize: { xs: "0.9rem", sm: "1rem" },
+                        width: { xs: "100%", sm: "auto" },
+                        padding: { xs: "8px", sm: "10px" },
+                        borderRadius: "8px",
+                        transition: "all 0.3s ease",
+                        "&:hover": {
+                          background: "rgba(76, 175, 80, 0.2)",
+                          transform: "scale(1.05)",
+                        },
+                        "&.Mui-selected": {
+                          background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
+                          color: "black",
+                          fontWeight: 700,
+                          "&:hover": {
+                            background: "linear-gradient(135deg, #272d31, #7091E6, #272d31)",
+                          },
+                        },
+                      },
+                    }}
+                  />
                 </motion.div>
               </LocalizationProvider>
             </Paper>
@@ -906,7 +903,6 @@ const Dashboard = () => {
                   p: { xs: 2, sm: 3 },
                   maxHeight: { xs: 300, sm: 400 },
                   overflow: 'auto',
-                  background: 'linear-gradient(145deg, #ffffff, #fff3e0)',
                   borderRadius: '16px',
                   boxShadow: '0 6px 20px rgba(0, 0, 0, 0.15)',
                   transition: 'all 0.3s ease',

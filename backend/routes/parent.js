@@ -10,6 +10,15 @@ const Parent = require('../models/parentModel');
 const Student = require('../models/studentModel');
 const authMiddleware = require('../middleware/auth');
 const mongoose = require('mongoose'); 
+const nodemailer = require("nodemailer");
+require('dotenv').config();
+const transporter = nodemailer.createTransport({
+  service: process.env.NODEMAILER_SERVICE,
+  auth: {
+    user: process.env.NODEMAILER_EMAIL,
+    pass: process.env.NODEMAILER_PASSWORD,
+  },
+});
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = 'uploads';
@@ -128,6 +137,24 @@ router.post(
       
       // Save both documents
       await Promise.all([user.save(), parent.save()]);
+      
+      const mailOptions = {
+  from: process.env.NODEMAILER_EMAIL,
+  to: email,
+  subject: "Parent Login Credentials",
+  html: `
+    <h3>Welcome to School Portal</h3>
+    <p>Dear ${name},</p>
+    <p>Your account has been created successfully.</p>
+    <p><b>Username:</b> ${email}</p>
+    <p><b>Password:</b> ${password}</p>
+    <br/>
+    <p>Please login and change your password.</p>
+  `,
+};
+
+await transporter.sendMail(mailOptions);
+
       
       // Update students with parent reference
       await Student.updateMany(

@@ -136,6 +136,14 @@ const BranchDetails = () => {
     <div className="branch-view-wrapper">
       <h3 className="branch-view-header">{branch.branchName} Details</h3>
       <div className="branch-view-principal-section">
+        <h4 className="branch-view-subheader">Branch Contact</h4>
+        <div className="principal-view-details">
+          <p><strong>Location:</strong> {branch.location || "N/A"}</p>
+          <p><strong>Phone:</strong> {branch.phoneNumber || "N/A"}</p>
+          <p><strong>Email:</strong> {branch.email || "N/A"}</p>
+        </div>
+      </div>
+      <div className="branch-view-principal-section">
         <h4 className="branch-view-subheader">Principal</h4>
         {branch.principal ? (
           <div className="principal-view-details">

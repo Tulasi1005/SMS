@@ -27,7 +27,18 @@ const EditBranch = () => {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
-        setFormData(branchRes.data);
+        setFormData({
+          ...branchRes.data,
+          phoneNumber: branchRes.data.phoneNumber || "",
+          email: branchRes.data.email || "",
+          address: {
+            street: branchRes.data.address?.street || "",
+            city: branchRes.data.address?.city || "",
+            state: branchRes.data.address?.state || "",
+            zipCode: branchRes.data.address?.zipCode || "",
+            country: branchRes.data.address?.country || "",
+          },
+        });
         setPrincipals(principalRes.data);
       } catch (err) {
         setError(err.response?.data?.message || "Error fetching data");
@@ -148,6 +159,34 @@ const EditBranch = () => {
               type="text"
               name="address.zipCode"
               value={formData.address.zipCode}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+        </div>
+        <div className="form-grid-two">
+          <div className="form-group">
+            <label className="form-label1">Phone Number</label>
+            <input
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              className="form-input"
+              inputMode="numeric"
+              maxLength={10}
+              pattern="[6-9][0-9]{9}"
+              title="Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label className="form-label1">Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
               className="form-input"
               required

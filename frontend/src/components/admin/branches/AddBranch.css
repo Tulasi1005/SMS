@@ -276,6 +276,13 @@
   display: block;
 }
 
+.add-branch-warning-icon {
+  color: #dc3545;
+  font-size: 0.95rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
 .add-branch-form-group {
   position: relative;
   margin-bottom: 1.5rem;

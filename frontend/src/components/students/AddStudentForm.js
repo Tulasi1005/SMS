@@ -439,6 +439,8 @@ const AddStudent = () => {
     },
   ]);
 
+  const [uniqueClasses, setUniqueClasses] = useState([]);
+
   const classAgeLimits = {
     UKG: { min: 3, max: 5 },
     LKG: { min: 3, max: 4 },
@@ -499,6 +501,21 @@ const AddStudent = () => {
       }
     }
   }, [navigate]);
+
+  // Add this useEffect to create unique class list
+  // Replace the previous useEffect for uniqueClasses with this improved version
+  useEffect(() => {
+    const dayScholarClasses = feeStructure.map((fee) => fee.class);
+    const hostelClasses = hostelFeeStructure.map((fee) => fee.class);
+
+    const allClasses = [...dayScholarClasses, ...hostelClasses]
+      .filter(Boolean)                    // remove null/undefined/empty
+      .map(normalizeClassName);           // normalize names
+
+    const uniqueClassesList = [...new Set(allClasses)].sort();
+
+    setUniqueClasses(uniqueClassesList);
+  }, [feeStructure, hostelFeeStructure]);
 
   useEffect(() => {
     fetchData();
@@ -703,10 +720,31 @@ const AddStudent = () => {
         [name]: type === "file" ? files[0] : value,
       }));
       if (name === "className" && value) {
-        const feeData = formData.isHostelStudent
-          ? hostelFeeStructure
-          : feeStructure;
-        const selectedFee = feeData.find((fee) => fee.class === value);
+
+        const normalizedValue = normalizeClassName(value);
+
+        const feeData = formData.isHostelStudent ? hostelFeeStructure : feeStructure;
+        const selectedFee = feeData.find((fee) =>
+          normalizeClassName(fee.class) === normalizedValue
+        );
+
+        setFormData((prev) => ({
+          ...prev,
+          className: normalizedValue,           // save normalized name
+          feeDetails: {
+            ...prev.feeDetails,
+            totalFee: selectedFee ?
+              (formData.isHostelStudent
+                ? selectedFee.tuition + selectedFee.library + selectedFee.hostel
+                : selectedFee.tuition + selectedFee.library + selectedFee.transport)
+              : prev.feeDetails.totalFee
+          },
+        }));
+
+        // const feeData = formData.isHostelStudent
+        //   ? hostelFeeStructure
+        //   : feeStructure;
+        // const selectedFee = feeData.find((fee) => fee.class === value);
         if (selectedFee) {
           const totalFee = formData.isHostelStudent
             ? selectedFee.tuition + selectedFee.library + selectedFee.hostel
@@ -1444,6 +1482,36 @@ const AddStudent = () => {
   );
   const totalPagesDayScholar = Math.ceil(dayScholarStudents.length / studentsPerPage);
 
+  // Add this function inside the AddStudent component
+  // Add this function inside the AddStudent component (before return)
+const normalizeClassName = (className) => {
+  if (!className) return "";
+
+  let normalized = className.toString().trim();
+
+  // Handle common variations: "10", "10th", "Grade 10", "10 Grade", "10st", etc.
+  const match = normalized.match(/^(\d+)(?:st|nd|rd|th)?\s*(?:Grade|class)?$/i);
+  
+  if (match) {
+    const num = parseInt(match[1], 10);
+    
+    let suffix = "th";
+    if (num % 10 === 1 && num % 100 !== 11) suffix = "st";
+    else if (num % 10 === 2 && num % 100 !== 12) suffix = "nd";
+    else if (num % 10 === 3 && num % 100 !== 13) suffix = "rd";
+
+    return `${num}${suffix} Grade`;
+  }
+
+  // Keep special classes as they are (UKG, LKG, etc.)
+  const specialClasses = ["UKG", "LKG", "Nursery", "Pre-K", "KG"];
+  if (specialClasses.some(cls => normalized.toUpperCase().includes(cls.toUpperCase()))) {
+    return normalized;
+  }
+
+  return normalized; // fallback
+};
+
   const paginate = (pageNumber, tableType) => {
     if (tableType === 'hostel') {
       setCurrentPageHostel(pageNumber);
@@ -1649,11 +1717,12 @@ const AddStudent = () => {
                 className="form-select shadow-sm"
               >
                 <option value="">All Classes</option>
-                {Object.keys(classAgeLimits).map((className) => (
-                  <option key={className} value={className}>
-                    {className}
-                  </option>
-                ))}
+  {uniqueClasses.map((className) => (
+    <option key={className} value={className}>
+      {className}
+    </option>
+  ))}
+
               </select>
             </div>
           </div>
@@ -1936,9 +2005,9 @@ const AddStudent = () => {
                       required
                     >
                       <option value="">Select Class</option>
-                      {feeStructure.map((fee) => (
-                        <option key={fee._id} value={fee.class}>
-                          {fee.class}
+                      {uniqueClasses.map((className) => (
+                        <option key={className} value={className}>
+                          {className}
                         </option>
                       ))}
                     </select>

@@ -731,7 +731,14 @@ app.post('/api/events', async (req, res) => {
   }
 });
 
-app.use('/uploads', express.static('uploads')); // Serve static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'))); // Serve static files
+
+const fs = require('fs');
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+  console.log('✅ uploads folder created');
+}
 
 // GET /api/driver/me - Fetch driver details by email query parameter
 
@@ -2264,10 +2271,15 @@ app.get('/api/branches', authMiddleware, restrictToAdmin, async (req, res) => {
 
 app.post('/api/branches', authMiddleware, restrictToAdmin, async (req, res) => {
   try {
-    const { branchName, location, address, principal, status } = req.body;
+    const { branchName, location, address, principal, status, phoneNumber, email  } = req.body;
+    const normalizedPhoneNumber = phoneNumber?.toString().trim();
+    const normalizedEmail = email?.trim().toLowerCase();
+
     if (
       !branchName ||
       !location ||
+      !normalizedPhoneNumber ||
+      !normalizedEmail ||
       !address ||
       !address.street ||
       !address.city ||
@@ -2276,12 +2288,31 @@ app.post('/api/branches', authMiddleware, restrictToAdmin, async (req, res) => {
       !address.country
     ) {
       return res.status(400).json({
-        message: 'branchName, location, and all address fields are required',
+        message: 'branchName, location, phoneNumber, email, and all address fields are required',
       });
     }
+
+    const phoneRegex = /^[6-9][0-9]{9}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!phoneRegex.test(normalizedPhoneNumber)) {
+      return res.status(400).json({
+        message:
+          'Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits.',
+      });
+    }
+
+    if (!emailRegex.test(normalizedEmail)) {
+      return res.status(400).json({
+        message: 'Invalid email format.',
+      });
+    }
+
     const branch = new Branch({
       branchName,
       location,
+      phoneNumber: normalizedPhoneNumber,
+      email: normalizedEmail,
       status: status || 'active',
       address,
       principal: principal || null, // Optional
@@ -2301,7 +2332,27 @@ app.put(
   restrictToAdmin,
   async (req, res) => {
     try {
-      const { branchName, location, status, address, principal } = req.body;
+      const { branchName, location, status, address, principal, phoneNumber, email  } = req.body;
+      
+      const normalizedPhoneNumber = phoneNumber?.toString().trim();
+      const normalizedEmail = email?.trim().toLowerCase();
+
+      const phoneRegex = /^[6-9][0-9]{9}$/;
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (normalizedPhoneNumber && !phoneRegex.test(normalizedPhoneNumber)) {
+        return res.status(400).json({
+          message:
+            "Phone number must start with 6, 7, 8, or 9 and be exactly 10 digits.",
+        });
+      }
+
+      if (normalizedEmail && !emailRegex.test(normalizedEmail)) {
+        return res.status(400).json({
+          message: "Invalid email format.",
+        });
+      }
+      
       if (principal) {
         const principalUser = await User.findById(principal);
         if (!principalUser || principalUser.role !== "principal") {
@@ -2317,6 +2368,11 @@ app.put(
         {
           branchName,
           location,
+          ...(normalizedPhoneNumber
+            ? { phoneNumber: normalizedPhoneNumber }
+            : {}),
+          ...(normalizedEmail ? { email: normalizedEmail } : {}),
+         
           status,
           address,
           principal: principal || null,
@@ -3231,10 +3287,16 @@ app.get(
   async (req, res) => {
     try {
       const { receiptId } = req.params;
-      const payment = await Payment.findOne({ receiptId }).populate(
-        "studentId",
-        "name email phone address"
-      );
+      const payment = await Payment.findOne({ receiptId })
+        .populate({
+          path: "studentId",
+          select: "name email phone address branchId",
+          populate: {
+            path: "branchId",
+            select: "branchName location phoneNumber email address",
+          },
+        })
+        .populate("branchId", "branchName location phoneNumber email address");
 
       if (!payment) {
         return res.status(404).json({
@@ -3242,6 +3304,10 @@ app.get(
           message: "Receipt not found",
         });
       }
+
+      const studentBranch = payment.studentId?.branchId;
+      const paymentBranch = payment.branchId;
+      const resolvedBranch = studentBranch || paymentBranch;
 
       const receiptData = {
         receiptId: payment.receiptId,
@@ -3258,7 +3324,11 @@ app.get(
         paymentStatus: payment.paymentStatus,
         transactionId:
           payment.paymentGatewayResponse?.cf_order_id || payment.orderId,
-        branchId: payment.branchId,
+        branchId: resolvedBranch?._id || payment.branchId || null,
+        branchName: resolvedBranch?.branchName || null,
+        branchLocation: resolvedBranch?.location || null,
+        branchPhoneNumber: resolvedBranch?.phoneNumber || null,
+        branchEmail: resolvedBranch?.email || null,
       };
 
       return res.json({
@@ -3276,7 +3346,6 @@ app.get(
     }
   }
 );
-
 // GET /payment-history/:studentId
 app.get(
   "/api/fees/payment-history/:studentId",

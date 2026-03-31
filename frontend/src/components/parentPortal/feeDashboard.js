@@ -329,58 +329,88 @@ const FeeDashboard = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {feeDetails.terms.map((term) => (
-                      <tr key={term._id}>
-                        <td style={{ fontWeight: 'bold', color: '#1f2937' }}>
-                          {term.termName}
-                        </td>
-                        <td style={{ color: '#1f2937' }}>
-                          ₹{term.amount.toLocaleString()}
-                        </td>
-                        <td style={{ color: '#065f46' }}>
-                          ₹{(term.paidAmount || 0).toLocaleString()}
-                        </td>
-                        <td style={{ color: '#b45309' }}>
-                          ₹
-                          {(
-                            term.amount - (term.paidAmount || 0)
-                          ).toLocaleString()}
-                        </td>
-                        <td style={{ color: '#1f2937' }}>
-                          {format(new Date(term.dueDate), 'dd MMM yyyy')}
-                          <div className='mt-1'>
-                            {getDueStatus(term.dueDate)}
-                          </div>
-                        </td>
-                        <td>{getStatusBadge(term.status)}</td>
-                        <td>
-                          {term.status.toLowerCase() !== 'paid' && (
-                            <Button
-                              size='sm'
-                              style={{
-                                borderColor: '#6366f1',
-                                color: '#6366f1',
-                                backgroundColor: 'transparent',
-                                borderRadius: '20px',
-                                padding: '0.25rem 1rem',
-                              }}
-                              onMouseOver={(e) => {
-                                e.target.style.backgroundColor = '#6366f1';
-                                e.target.style.color = '#fff';
-                              }}
-                              onMouseOut={(e) => {
-                                e.target.style.backgroundColor = 'transparent';
-                                e.target.style.color = '#6366f1';
-                              }}
-                              onClick={() => handlePayNow(term._id)}
-                            >
-                              Pay Now
-                            </Button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
+                        {feeDetails.paymentHistory
+                          .slice(0, 3)
+                          .map((payment) => {
+                            const receiptId =
+                              payment.receiptId || payment.receiptNumber;
+
+                            return (
+                              <tr key={receiptId || payment.paymentDate}>
+                              <td style={{ color: '#1f2937' }}>
+                                {payment.paymentDate
+                                  ? format(
+                                      new Date(payment.paymentDate),
+                                      'dd MMM yyyy'
+                                    )
+                                  : 'N/A'}
+                              </td>
+                              <td style={{ fontWeight: 'bold', color: '#1f2937' }}>
+                                {receiptId || 'N/A'}
+                              </td>
+                              <td style={{ color: '#1f2937' }}>
+                                {payment.termName || 'N/A'}
+                              </td>
+                              <td style={{ color: '#065f46' }}>
+                                ₹{payment.amountPaid.toLocaleString()}
+                              </td>
+                              <td style={{ color: '#1f2937' }}>
+                                {payment.paymentMethod || 'Unknown'}
+                              </td>
+                              <td>
+                                <Badge
+                                  style={{
+                                    backgroundColor:
+                                      payment.status === 'SUCCESS'
+                                        ? '#d1fae5'
+                                        : payment.status === 'FAILED'
+                                        ? '#fee2e2'
+                                        : '#fef3c7',
+                                    color:
+                                      payment.status === 'SUCCESS'
+                                        ? '#065f46'
+                                        : payment.status === 'FAILED'
+                                        ? '#b91c1c'
+                                        : '#b45309',
+                                    borderRadius: '12px',
+                                    padding: '0.5em 1em',
+                                  }}
+                                >
+                                  {payment.status || 'Unknown'}
+                                </Badge>
+                              </td>
+                              <td style={{ color: '#b91c1c' }}>
+                                {payment.failureReason || '-'}
+                              </td>
+                              <td>
+                                {payment.status === 'SUCCESS' && receiptId && (
+                                  <Button
+                                    size='sm'
+                                    style={{
+                                      borderColor: '#6366f1',
+                                      color: '#6366f1',
+                                      backgroundColor: 'transparent',
+                                      borderRadius: '20px',
+                                      padding: '0.25rem 1rem',
+                                    }}
+                                    onMouseOver={(e) => {
+                                      e.target.style.backgroundColor = '#6366f1';
+                                      e.target.style.color = '#fff';
+                                    }}
+                                    onMouseOut={(e) => {
+                                      e.target.style.backgroundColor = 'transparent';
+                                      e.target.style.color = '#6366f1';
+                                    }}
+                                    onClick={() => handleViewReceipt(receiptId)}
+                                  >
+                                    View Receipt
+                                  </Button>
+                                )}
+                              </td>
+                              </tr>
+                            );
+                          })}
+                      </tbody>
                 </Table>
               </div>
             </Card.Body>

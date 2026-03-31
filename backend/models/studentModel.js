@@ -69,7 +69,7 @@ const studentSchema = new mongoose.Schema({
         receiptNumber: {
           type: String,
           required: true,
-          unique: true,
+          // unique: true,
           trim: true,
         },
         status: {
