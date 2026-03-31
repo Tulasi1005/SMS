@@ -141,6 +141,7 @@ const upload = multer({
 }).single('profilePicture');
 
 // POST /api/students - Create a new student
+
 router.post(
   '/students',
   authMiddleware,
@@ -315,7 +316,8 @@ router.post(
 
       const savedStudent = await newStudent.save({ session });
 
-      const mailOptions = {
+
+const mailOptions = {
   from: process.env.NODEMAILER_EMAIL,
   to: email,
   subject: "Student Login Credentials",
@@ -331,6 +333,8 @@ router.post(
 };
 
 await transporter.sendMail(mailOptions);
+
+
       // Handle health record
       let healthRecordId = null;
       if (
